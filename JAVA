@@ -1,449 +1,364 @@
-2.a Prime NO.
-import java.util.*;
+1.Linear Search
 
-class Prime {
-    public static void main(String[] args) {
-        int n, i, flag = 0;
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter number: ");
-        n = sc.nextInt();
+#include <stdio.h>
+#include <time.h>
 
-        for(i = 2; i <= n/2; i++) {
-            if(n % i == 0) {
-                flag = 1;
+int main() {
+    int a[100], n, key, i, found = 0;
+    clock_t start, end;
+
+    printf("Enter n: ");
+    scanf("%d", &n);
+
+    for(i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    printf("Enter key: ");
+    scanf("%d", &key);
+
+    start = clock();
+
+    for(i = 0; i < n; i++) {
+        if(a[i] == key) {
+            found = 1;
+            break;
+        }
+    }
+
+    end = clock();
+
+    if(found)
+        printf("Found at position %d\n", i+1);
+    else
+        printf("Not found\n");
+
+    printf("CPU Time: %lf\n", (double)(end - start)/CLOCKS_PER_SEC);
+}
+
+
+
+2.Binary Search
+#include <stdio.h>
+#include <time.h>
+
+int main() {
+    int a[100], n, key, low, high, mid, found = 0;
+    clock_t start, end;
+
+    scanf("%d", &n);
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+
+    scanf("%d",&key);
+
+    low = 0; high = n-1;
+
+    start = clock();
+
+    while(low <= high) {
+        mid = (low + high)/2;
+        if(a[mid] == key) {
+            found = 1;
+            break;
+        }
+        else if(key < a[mid])
+            high = mid - 1;
+        else
+            low = mid + 1;
+    }
+
+    end = clock();
+
+    if(found) printf("Found\n");
+    else printf("Not Found\n");
+
+    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+}
+
+
+3.MergeSort
+#include <stdio.h>
+#include <time.h>
+
+void merge(int a[], int l, int m, int r) {
+    int i=l, j=m+1, k=0, temp[100];
+
+    while(i<=m && j<=r)
+        temp[k++] = (a[i] < a[j]) ? a[i++] : a[j++];
+
+    while(i<=m) temp[k++] = a[i++];
+    while(j<=r) temp[k++] = a[j++];
+
+    for(i=l, k=0; i<=r; i++,k++)
+        a[i] = temp[k];
+}
+
+void mergesort(int a[], int l, int r) {
+    if(l < r) {
+        int m = (l+r)/2;
+        mergesort(a,l,m);
+        mergesort(a,m+1,r);
+        merge(a,l,m,r);
+    }
+}
+
+int main() {
+    int a[100], n;
+    clock_t start, end;
+
+    scanf("%d",&n);
+    for(int i=0;i<n;i++) scanf("%d",&a[i]);
+
+    start = clock();
+    mergesort(a,0,n-1);
+    end = clock();
+
+    for(int i=0;i<n;i++) printf("%d ",a[i]);
+
+    printf("\nCPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+}
+
+
+4.Knapsack
+#include <stdio.h>
+#include <time.h>
+
+int main() {
+    int n, w[10], p[10], i, j, capacity;
+    float ratio[10], total = 0;
+
+    clock_t start, end;
+
+    scanf("%d",&n);
+    for(i=0;i<n;i++) {
+        scanf("%d%d",&w[i],&p[i]);
+        ratio[i] = (float)p[i]/w[i];
+    }
+
+    scanf("%d",&capacity);
+
+    start = clock();
+
+    for(i=0;i<n-1;i++)
+        for(j=i+1;j<n;j++)
+            if(ratio[i] < ratio[j]) {
+                float temp = ratio[i]; ratio[i]=ratio[j]; ratio[j]=temp;
+                int t=w[i]; w[i]=w[j]; w[j]=t;
+                t=p[i]; p[i]=p[j]; p[j]=t;
+            }
+
+    for(i=0;i<n;i++) {
+        if(capacity >= w[i]) {
+            total += p[i];
+            capacity -= w[i];
+        } else {
+            total += ratio[i]*capacity;
+            break;
+        }
+    }
+
+    end = clock();
+
+    printf("Max Profit: %f\n", total);
+    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+}
+
+
+5.Job Sequencing
+#include <stdio.h>
+#include <time.h>
+
+int main() {
+    int n, profit[10], deadline[10], slot[10]={0};
+    int i,j, total=0;
+
+    clock_t start, end;
+
+    scanf("%d",&n);
+    for(i=0;i<n;i++)
+        scanf("%d%d",&profit[i],&deadline[i]);
+
+    start = clock();
+
+    for(i=0;i<n-1;i++)
+        for(j=i+1;j<n;j++)
+            if(profit[i] < profit[j]) {
+                int t=profit[i]; profit[i]=profit[j]; profit[j]=t;
+                t=deadline[i]; deadline[i]=deadline[j]; deadline[j]=t;
+            }
+
+    for(i=0;i<n;i++)
+        for(j=deadline[i]-1;j>=0;j--)
+            if(slot[j]==0) {
+                slot[j]=1;
+                total += profit[i];
                 break;
             }
-        }
 
-        if(flag == 0 && n > 1)
-            System.out.println("Prime");
-        else
-            System.out.println("Not Prime");
-    }
-}
+    end = clock();
 
-2.b palindrom
-import java.util.*;
-
-class Palindrome {
-    public static void main(String[] args) {
-        int n, rev = 0, temp;
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter number: ");
-        n = sc.nextInt();
-        temp = n;
-
-        while(n > 0) {
-            int d = n % 10;
-            rev = rev * 10 + d;
-            n = n / 10;
-        }
-
-        if(temp == rev)
-            System.out.println("Palindrome");
-        else
-            System.out.println("Not Palindrome");
-    }
+    printf("Max Profit: %d\n", total);
+    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
 }
 
 
-2.c Area
-import java.util.*;
-
-class Area {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter radius: ");
-        double r = sc.nextDouble();
-        System.out.println("Circle Area: " + (3.14 * r * r));
-
-        System.out.print("Enter length and breadth: ");
-        int l = sc.nextInt(), b = sc.nextInt();
-        System.out.println("Rectangle Area: " + (l * b));
-
-        System.out.print("Enter side: ");
-        int s = sc.nextInt();
-        System.out.println("Square Area: " + (s * s));
-
-        sc.close();
-    }
-}
-
-3.a Pattern
-
-class Pattern {
-    public static void main(String[] args) {
-        for(int i = 5; i >= 1; i--) {
-            for(int j = 1; j <= i; j++)
-                System.out.print("* ");
-            System.out.println();
-        }
-    }
-}
-
-
-3.b Sum of array
-import java.util.Scanner;
-
-public class SumOfArrays{
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter number of elements: ");
-        int n = sc.nextInt();
-        int[] arr = new int[n];
-        int sum = 0;
-
-        for (int i = 0; i < n; i++) {
-            System.out.print("Enter element " + (i + 1) + ": ");
-            arr[i] = sc.nextInt();
-            sum += arr[i];
-        }
-
-        System.out.println("Sum of array elements: " + sum);
-    }
-}
-
-
-
-
-3.c Transpose matrix
-
-import java.util.Scanner;
-public class TransposeOfMatrix {
-    
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter rows: ");
-        int r = sc.nextInt();
-        System.out.print("Enter columns: ");
-        int c = sc.nextInt();
-
-        int[][] A = new int[r][c];
-        int[][] T = new int[c][r];
-
-        System.out.println("Enter matrix elements:");
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                A[i][j] = sc.nextInt();
-            }
-        }
-
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                T[j][i] = A[i][j];
-            }
-        }
-
-        System.out.println("Transpose Matrix:");
-        for (int i = 0; i < c; i++) {
-            for (int j = 0; j < r; j++) {
-                System.out.print(T[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-}
-
-
-
-
-4.a Division by 7
-import java.util.Scanner;
-public class DivisibleBy7 {
-    public static void main(String[] args) {
-
-        int count = 0;
-        int sum = 0;
-
-        for (int i = 101; i < 200; i++) {
-            if (i % 7 == 0) {
-                count++;
-                sum += i;
-            }
-        }
-
-        System.out.println("Count of numbers divisible by 7: " + count);
-        System.out.println("Sum of numbers divisible by 7: " + sum);
-    }
-}
-
-4.b Marks Range
-import java.util.Scanner;
-
-public class StudentMarksRange {
-    public static void main(String[] args) {
-
-        Scanner sc = new Scanner(System.in);
-
-        int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
-
-        System.out.print("Enter number of students: ");
-        int n = sc.nextInt();
-
-        for (int i = 1; i <= n; i++) {
-            System.out.print("Enter marks: ");
-            int m = sc.nextInt();
-
-            if (m >= 81 && m <= 100)
-                c1++;
-            else if (m >= 61 && m <= 80)
-                c2++;
-            else if (m >= 41 && m <= 60)
-                c3++;
-            else if (m >= 0 && m <= 40)
-                c4++;
-        }
-
-        System.out.println("Students with marks 81-100: " + c1);
-        System.out.println("Students with marks 61-80: " + c2);
-        System.out.println("Students with marks 41-60: " + c3);
-        System.out.println("Students with marks 0-40: " + c4);
-    }
-}
-
-
-
-5.
-import java.util.*;
-
-class Bank {
-    String name;
-    int accNo;
-    String type;
-    double balance;
-
-    void assign(String n, int a, String t, double b) {
-        name = n;
-        accNo = a;
-        type = t;
-        balance = b;
-    }
-
-    void deposit(double amt) {
-        balance += amt;
-    }
-
-    void withdraw(double amt) {
-        if(balance >= amt)
-            balance -= amt;
-        else
-            System.out.println("Insufficient Balance");
-    }
-
-    void display() {
-        System.out.println("Name: " + name);
-        System.out.println("Account No: " + accNo);
-        System.out.println("Balance: " + balance);
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        Bank b = new Bank();
-
-        System.out.print("Enter name: ");
-        String name = sc.nextLine();
-
-        System.out.print("Enter account number: ");
-        int accNo = sc.nextInt();
-
-        System.out.print("Enter account type: ");
-        String type = sc.next();
-
-        System.out.print("Enter balance: ");
-        double balance = sc.nextDouble();
-
-        b.assign(name, accNo, type, balance);
-
-        System.out.print("Enter deposit amount: ");
-        double dep = sc.nextDouble();
-        b.deposit(dep);
-
-        System.out.print("Enter withdraw amount: ");
-        double wd = sc.nextDouble();
-        b.withdraw(wd);
-
-        System.out.println("\n--- Account Details ---");
-        b.display();
-
-        sc.close();
-    }
-}
-
-6.a Occurance
-import java.util.*;
-
-class CountWord {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter sentence: ");
-        String text = sc.nextLine();
-
-        System.out.print("Enter word to count: ");
-        String word = sc.nextLine();
-
-        int count = 0;
-        String arr[] = text.split(" ");
-
-        for(String w : arr) {
-            if(w.equals(word)) {
-                count++;
-            }
-        }
-
-        System.out.println("Count = " + count);
-        sc.close();
-    }
-}
-6.b Shopping list
-import java.util.*;
-
-class Shopping {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        Vector<String> v = new Vector<>();
-
-        System.out.print("Enter number of items: ");
-        int n = sc.nextInt();
-        sc.nextLine(); // consume newline
-
-        System.out.println("Enter items:");
-
-        for(int i = 0; i < n; i++) {
-            v.add(sc.nextLine());
-        }
-
-        System.out.println("Shopping List: " + v);
-        sc.close();
-    }
-}
-6.c StringSort
-import java.util.*;
-
-class SortString {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter a string: ");
-        String str = sc.nextLine();
-
-        char arr[] = str.toCharArray();
-        Arrays.sort(arr);
-
-        System.out.println("Sorted string: " + new String(arr));
-        sc.close();
-    }
-}
-
-7.a Sort interface
-import java.util.*;
-
-interface Sortable {
-    void sort(int arr[]);
-}
-
-class QuickSort implements Sortable {
-    public void sort(int arr[]) {
-        Arrays.sort(arr);
-        for(int i : arr) {
-            System.out.print(i + " ");
-        }
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Enter number of elements: ");
-        int n = sc.nextInt();
-
-        int arr[] = new int[n];
-
-        System.out.println("Enter elements:");
-        for(int i = 0; i < n; i++) {
-            arr[i] = sc.nextInt();
-        }
-
-        QuickSort q = new QuickSort();
-        q.sort(arr);
-
-        sc.close();
-    }
-}
-
-
-7.b Drawable Interface
-interface Drawable {
-    void draw();
-}
-
-class Circle implements Drawable {
-    public void draw() {
-        System.out.println("Drawing Circle");
-    }
-}
-
-class Rectangle implements Drawable {
-    public void draw() {
-        System.out.println("Drawing Rectangle");
-    }
-}
-
-public class TestDrawable {
-    public static void main(String[] args) {
-        Drawable d1 = new Circle();
-        Drawable d2 = new Rectangle();
-
-        d1.draw();
-        d2.draw();
-    }
-}
-
-
-8.a Duplicate exception
-
-import java.util.*;
-
-class DuplicateCheck {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int arr[] = new int[5];
-
-        System.out.println("Enter 5 numbers:");
-
-        for(int i = 0; i < 5; i++)
-            arr[i] = sc.nextInt();
-
-        boolean found = false;
-
-        for(int i = 0; i < 5; i++) {
-            for(int j = i + 1; j < 5; j++) {
-                if(arr[i] == arr[j]) {
-                    found = true;
-                    System.out.println("Duplicate Found: " + arr[i]);
+6.Prims 
+#include <stdio.h>
+#include <limits.h>
+#include <time.h>
+
+int main() {
+    int n, cost[10][10], visited[10]={0};
+    int min, x=0,y=0, total=0;
+
+    clock_t start,end;
+
+    scanf("%d",&n);
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            scanf("%d",&cost[i][j]);
+
+    visited[0]=1;
+
+    start = clock();
+
+    for(int k=0;k<n-1;k++) {
+        min = INT_MAX;
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                if(visited[i] && !visited[j] && cost[i][j] < min) {
+                    min = cost[i][j];
+                    x=i; y=j;
                 }
-            }
-        }
 
-        if(!found)
-            System.out.println("No Duplicates");
-
-        sc.close();
+        visited[y]=1;
+        total += min;
     }
+
+    end = clock();
+
+    printf("Cost: %d\n",total);
+    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
 }
 
-8.b
-import java.io.*;
+7.Kruskals
+#include <stdio.h>
+#include <time.h>
 
-class FileRead {
-    public static void main(String[] args) {
-        try {
-            FileReader fr = new FileReader("test.txt");
-            System.out.println("File opened");
-        } catch(Exception e) {
-            System.out.println("File not found");
+int parent[10];
+
+int find(int i) {
+    while(parent[i]) i=parent[i];
+    return i;
+}
+
+void union1(int i,int j) {
+    parent[j]=i;
+}
+
+int main() {
+    int n, cost[10][10], min, total=0;
+    clock_t start,end;
+
+    scanf("%d",&n);
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            scanf("%d",&cost[i][j]);
+
+    start = clock();
+
+    for(int k=0;k<n-1;k++) {
+        min=999;
+        int a=-1,b=-1;
+
+        for(int i=0;i<n;i++)
+            for(int j=0;j<n;j++)
+                if(cost[i][j] < min) {
+                    min = cost[i][j];
+                    a=i; b=j;
+                }
+
+        int u=find(a), v=find(b);
+
+        if(u!=v) {
+            union1(u,v);
+            total += min;
         }
+
+        cost[a][b]=cost[b][a]=999;
     }
+
+    end = clock();
+
+    printf("Cost: %d\n",total);
+    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+}
+
+
+8.Multistage graph
+#include <stdio.h>
+#include <limits.h>
+#include <time.h>
+
+int main() {
+    int n, cost[10][10], dist[10];
+    clock_t start,end;
+
+    scanf("%d",&n);
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            scanf("%d",&cost[i][j]);
+
+    start = clock();
+
+    dist[n-1] = 0;
+
+    for(int i=n-2;i>=0;i--) {
+        dist[i] = INT_MAX;
+        for(int j=i+1;j<n;j++)
+            if(cost[i][j] && dist[i] > cost[i][j]+dist[j])
+                dist[i] = cost[i][j]+dist[j];
+    }
+
+    end = clock();
+
+    printf("Min Cost: %d\n",dist[0]);
+    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+}
+
+
+9.TSP
+#include <stdio.h>
+#include <limits.h>
+#include <time.h>
+
+int main() {
+    int n, cost[10][10], visited[10]={0};
+    int i, j, min, total=0, city=0;
+
+    clock_t start,end;
+
+    scanf("%d",&n);
+    for(i=0;i<n;i++)
+        for(j=0;j<n;j++)
+            scanf("%d",&cost[i][j]);
+
+    visited[0]=1;
+
+    start = clock();
+
+    for(i=0;i<n-1;i++) {
+        min = INT_MAX;
+        for(j=0;j<n;j++)
+            if(!visited[j] && cost[city][j] < min) {
+                min = cost[city][j];
+                city = j;
+            }
+        visited[city]=1;
+        total += min;
+    }
+
+    end = clock();
+
+    printf("Cost: %d\n",total);
+    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
 }
