@@ -41,23 +41,47 @@ int main() {
 #include <stdio.h>
 #include <time.h>
 
+void sort(int a[], int n) {
+    for(int i = 0; i < n-1; i++) {
+        for(int j = 0; j < n-i-1; j++) {
+            if(a[j] > a[j+1]) {
+                int temp = a[j];
+                a[j] = a[j+1];
+                a[j+1] = temp;
+            }
+        }
+    }
+}
+
 int main() {
-    int a[100], n, key, low, high, mid, found = 0;
+    int a[100], n, key, low, high, mid;
+    int found = 0, pos = -1;
     clock_t start, end;
 
+    printf("Enter number of elements: ");
     scanf("%d", &n);
-    for(int i=0;i<n;i++) scanf("%d",&a[i]);
 
-    scanf("%d",&key);
+    printf("Enter %d elements:\n", n);
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &a[i]);
+    }
 
-    low = 0; high = n-1;
+    sort(a, n);
+
+    printf("Enter element to search: ");
+    scanf("%d", &key);
+
+    low = 0;
+    high = n - 1;
 
     start = clock();
 
     while(low <= high) {
-        mid = (low + high)/2;
+        mid = low + (high - low) / 2;
+
         if(a[mid] == key) {
             found = 1;
+            pos = mid;   
             break;
         }
         else if(key < a[mid])
@@ -68,11 +92,17 @@ int main() {
 
     end = clock();
 
-    if(found) printf("Found\n");
-    else printf("Not Found\n");
+    
+    if(found)
+        printf("Element FOUND at position %d (index %d)\n", pos + 1, pos);
+    else
+        printf("Element NOT FOUND\n");
 
-    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+    printf("CPU Time: %lf seconds\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+    return 0;
 }
+
 
 
 3.MergeSort
@@ -123,44 +153,64 @@ int main() {
 #include <time.h>
 
 int main() {
-    int n, w[10], p[10], i, j, capacity;
-    float ratio[10], total = 0;
+    int n, i, j, capacity;
+    int w[100], p[100];
+    float ratio[100], total = 0;
 
     clock_t start, end;
 
-    scanf("%d",&n);
-    for(i=0;i<n;i++) {
-        scanf("%d%d",&w[i],&p[i]);
-        ratio[i] = (float)p[i]/w[i];
+    printf("Enter number of items: ");
+    scanf("%d", &n);
+
+    printf("Enter weight and profit:\n");
+    for(i = 0; i < n; i++) {
+        scanf("%d %d", &w[i], &p[i]);
+        ratio[i] = (float)p[i] / w[i];
     }
 
-    scanf("%d",&capacity);
+    printf("Enter capacity: ");
+    scanf("%d", &capacity);
 
     start = clock();
 
-    for(i=0;i<n-1;i++)
-        for(j=i+1;j<n;j++)
+    // Sort by p/w ratio (descending)
+    for(i = 0; i < n - 1; i++) {
+        for(j = i + 1; j < n; j++) {
             if(ratio[i] < ratio[j]) {
-                float temp = ratio[i]; ratio[i]=ratio[j]; ratio[j]=temp;
-                int t=w[i]; w[i]=w[j]; w[j]=t;
-                t=p[i]; p[i]=p[j]; p[j]=t;
-            }
+                float temp = ratio[i];
+                ratio[i] = ratio[j];
+                ratio[j] = temp;
 
-    for(i=0;i<n;i++) {
+                int t = w[i];
+                w[i] = w[j];
+                w[j] = t;
+
+                t = p[i];
+                p[i] = p[j];
+                p[j] = t;
+            }
+        }
+    }
+
+    // Greedy selection
+    for(i = 0; i < n; i++) {
         if(capacity >= w[i]) {
             total += p[i];
             capacity -= w[i];
         } else {
-            total += ratio[i]*capacity;
+            total += ratio[i] * capacity;
             break;
         }
     }
 
     end = clock();
 
-    printf("Max Profit: %f\n", total);
-    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+    printf("Maximum Profit: %.2f\n", total);
+    printf("CPU Time: %lf\n", (double)(end - start)/CLOCKS_PER_SEC);
+
+    return 0;
 }
+
 
 
 5.Job Sequencing
@@ -173,9 +223,12 @@ int main() {
 
     clock_t start, end;
 
+    Printf("Enter n: ");
     scanf("%d",&n);
+
+    printf("Enter profit & deadline: ");
     for(i=0;i<n;i++)
-        scanf("%d%d",&profit[i],&deadline[i]);
+    scanf("%d%d",&profit[i],&deadline[i]);
 
     start = clock();
 
@@ -207,90 +260,144 @@ int main() {
 #include <time.h>
 
 int main() {
-    int n, cost[10][10], visited[10]={0};
-    int min, x=0,y=0, total=0;
+    int n, cost[100][100], visited[100] = {0};
+    int min, x = -1, y = -1, total = 0;
 
-    clock_t start,end;
+    clock_t start, end;
 
-    scanf("%d",&n);
-    for(int i=0;i<n;i++)
-        for(int j=0;j<n;j++)
-            scanf("%d",&cost[i][j]);
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
 
-    visited[0]=1;
+    printf("Enter cost matrix:\n");
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            scanf("%d", &cost[i][j]);
+
+            if(i != j && cost[i][j] == 0)
+                cost[i][j] = INT_MAX;
+        }
+    }
+
+    visited[0] = 1;
 
     start = clock();
 
-    for(int k=0;k<n-1;k++) {
-        min = INT_MAX;
-        for(int i=0;i<n;i++)
-            for(int j=0;j<n;j++)
-                if(visited[i] && !visited[j] && cost[i][j] < min) {
-                    min = cost[i][j];
-                    x=i; y=j;
-                }
+    printf("\nEdges selected:\n");
 
-        visited[y]=1;
+    for(int k = 0; k < n - 1; k++) {
+        min = INT_MAX;
+        x = -1; 
+        y = -1;
+
+        for(int i = 0; i < n; i++) {
+            if(visited[i]) {
+                for(int j = 0; j < n; j++) {
+                    if(!visited[j] && cost[i][j] < min) {
+                        min = cost[i][j];
+                        x = i;
+                        y = j;
+                    }
+                }
+            }
+        }
+
+        if(x == -1 || y == -1) {
+            printf("Graph is not connected!\n");
+            return 0;
+        }
+
+        printf("%d -> %d  cost = %d\n", x, y, min);
+
+        visited[y] = 1;
         total += min;
     }
 
     end = clock();
 
-    printf("Cost: %d\n",total);
-    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+    printf("\nMinimum Cost (MST): %d\n", total);
+    printf("CPU Time: %lf seconds\n", (double)(end - start)/CLOCKS_PER_SEC);
+
+    return 0;
 }
+
 
 7.Kruskals
 #include <stdio.h>
+#include <limits.h>
 #include <time.h>
 
-int parent[10];
+int parent[100];
 
 int find(int i) {
-    while(parent[i]) i=parent[i];
+    while(parent[i])
+        i = parent[i];
     return i;
 }
 
-void union1(int i,int j) {
-    parent[j]=i;
+void union1(int i, int j) {
+    parent[j] = i;
 }
 
 int main() {
-    int n, cost[10][10], min, total=0;
-    clock_t start,end;
+    int n, cost[100][100], min, total = 0;
+    int a, b, u, v;
 
-    scanf("%d",&n);
-    for(int i=0;i<n;i++)
-        for(int j=0;j<n;j++)
-            scanf("%d",&cost[i][j]);
+    clock_t start, end;
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter cost matrix:\n");
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < n; j++) {
+            scanf("%d", &cost[i][j]);
+
+            if(i != j && cost[i][j] == 0)
+                cost[i][j] = INT_MAX;
+        }
+    }
+
+    for(int i = 0; i < n; i++)
+        parent[i] = 0;
 
     start = clock();
 
-    for(int k=0;k<n-1;k++) {
-        min=999;
-        int a=-1,b=-1;
+    printf("\nEdges selected:\n");
 
-        for(int i=0;i<n;i++)
-            for(int j=0;j<n;j++)
+    int edges = 0;
+
+    while(edges < n - 1) {
+        min = INT_MAX;
+
+        for(int i = 0; i < n; i++) {
+            for(int j = 0; j < n; j++) {
                 if(cost[i][j] < min) {
                     min = cost[i][j];
-                    a=i; b=j;
+                    a = u = i;
+                    b = v = j;
                 }
-
-        int u=find(a), v=find(b);
-
-        if(u!=v) {
-            union1(u,v);
-            total += min;
+            }
         }
 
-        cost[a][b]=cost[b][a]=999;
+        u = find(u);
+        v = find(v);
+
+        if(u != v) {
+            union1(u, v);
+            printf("%d -> %d  cost = %d\n", a, b, min);
+            total += min;
+            edges++;
+        }
+
+        cost[a][b] = cost[b][a] = INT_MAX;
     }
 
     end = clock();
 
-    printf("Cost: %d\n",total);
-    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+    printf("\nMinimum Cost (MST): %d\n", total);
+    printf("CPU Time: %lf seconds\n", (double)(end - start)/CLOCKS_PER_SEC);
+
+    return 0;
 }
 
 
@@ -300,65 +407,109 @@ int main() {
 #include <time.h>
 
 int main() {
-    int n, cost[10][10], dist[10];
-    clock_t start,end;
+    int n, cost[10][10], dist[10], path[10];
+    clock_t start, end;
 
-    scanf("%d",&n);
-    for(int i=0;i<n;i++)
-        for(int j=0;j<n;j++)
-            scanf("%d",&cost[i][j]);
+    printf("Enter n: ");
+    scanf("%d", &n);
+    
+    printf("Enter Cost matrix:\n");
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            scanf("%d", &cost[i][j]);
 
     start = clock();
 
     dist[n-1] = 0;
+    path[n-1] = -1;
 
-    for(int i=n-2;i>=0;i--) {
+    for(int i = n - 2; i >= 0; i--) {
         dist[i] = INT_MAX;
-        for(int j=i+1;j<n;j++)
-            if(cost[i][j] && dist[i] > cost[i][j]+dist[j])
-                dist[i] = cost[i][j]+dist[j];
+        path[i] = -1;
+
+        for(int j = i + 1; j < n; j++) {
+            if(cost[i][j] != 0 && dist[j] != INT_MAX) {
+                if(dist[i] > cost[i][j] + dist[j]) {
+                    dist[i] = cost[i][j] + dist[j];
+                    path[i] = j;   // ✅ FIX
+                }
+            }
+        }
     }
 
     end = clock();
 
-    printf("Min Cost: %d\n",dist[0]);
-    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+    if(dist[0] == INT_MAX) {
+        printf("\nNo path exists!\n");
+        return 0;
+    }
+
+    printf("\nMin Cost: %d\n", dist[0]);
+
+    printf("Path: ");
+    int i = 0;
+    while(i != -1) {
+        printf("%d ", i);
+        i = path[i];
+    }
+
+    printf("\nCPU Time: %lf\n",
+           (double)(end - start)/CLOCKS_PER_SEC);
+
+    return 0;
 }
 
 
 9.TSP
+
 #include <stdio.h>
 #include <limits.h>
-#include <time.h>
 
-int main() {
-    int n, cost[10][10], visited[10]={0};
-    int i, j, min, total=0, city=0;
+#define MAX 10
 
-    clock_t start,end;
+int n;
+int cost[MAX][MAX];
+int dp[1<<MAX][MAX];
 
-    scanf("%d",&n);
-    for(i=0;i<n;i++)
-        for(j=0;j<n;j++)
-            scanf("%d",&cost[i][j]);
+int tsp(int mask, int pos) {
 
-    visited[0]=1;
+    if(mask == (1<<n) - 1)
+        return cost[pos][0];
 
-    start = clock();
+    if(dp[mask][pos] != -1)
+        return dp[mask][pos];
 
-    for(i=0;i<n-1;i++) {
-        min = INT_MAX;
-        for(j=0;j<n;j++)
-            if(!visited[j] && cost[city][j] < min) {
-                min = cost[city][j];
-                city = j;
-            }
-        visited[city]=1;
-        total += min;
+    int ans = INT_MAX;
+
+    for(int city = 0; city < n; city++) {
+        if((mask & (1<<city)) == 0) {
+            int newAns = cost[pos][city] +
+                         tsp(mask | (1<<city), city);
+
+            if(newAns < ans)
+                ans = newAns;
+        }
     }
 
-    end = clock();
+    return dp[mask][pos] = ans;
+}
 
-    printf("Cost: %d\n",total);
-    printf("CPU Time: %lf\n",(double)(end-start)/CLOCKS_PER_SEC);
+int main() {
+    printf("Enter number of cities: ");
+    scanf("%d", &n);
+
+    printf("Enter cost matrix:\n");
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            scanf("%d", &cost[i][j]);
+
+    for(int i = 0; i < (1<<n); i++)
+        for(int j = 0; j < n; j++)
+            dp[i][j] = -1;
+
+    int result = tsp(1, 0); 
+
+    printf("\nMinimum Cost (TSP - DP): %d\n", result);
+
+    return 0;
 }
